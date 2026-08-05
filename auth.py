@@ -1,6 +1,7 @@
 from datetime import datetime, timedelta, timezone
 from typing import Annotated
-
+from services.google_service import verify_google_token
+from pydantic import BaseModel
 from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from jose import JWTError, jwt
@@ -185,3 +186,46 @@ async def me(
     current_user=Depends(get_current_user),
 ):
     return current_user
+
+class GoogleToken(BaseModel):
+    credential: str
+
+@router.post("/google", response_model=Token)
+async def google_login(
+    body: GoogleToken,
+    db: db_dependency,
+):
+    google_user = verify_google_token(body.credential)
+
+    if google_user is None:
+        raise HTTPException(
+            status_code=401,
+            detail="Invalid Google token.",
+        )
+
+    user = (
+        db.query(User)
+        .filter(User.email == google_user["email"])
+        .first()
+    )
+
+    if user is None:
+        user = User(
+            name=google_user["name"],
+            email=google_user["email"],
+            password="",  # Google users don't use local passwords
+        )
+
+        db.add(user)
+        db.commit()
+        db.refresh(user)
+
+    access_token = create_access_token(
+        user.email,
+        user.id,
+    )
+
+    return {
+        "access_token": access_token,
+        "token_type": "bearer",
+    }

@@ -1,13 +1,12 @@
 import { motion } from "framer-motion";
-import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { Link, useNavigate } from "react-router-dom";
-import { Eye, EyeOff } from "lucide-react";
 import { toast } from "sonner";
 
 import api from "../api/api";
 import { useAuth } from "../context/AuthContext";
 
+import GoogleButton from "../components/auth/GoogleButton";
 import Button from "../components/ui/Button";
 import Card from "../components/ui/Card";
 import Input from "../components/ui/Input";
@@ -21,8 +20,6 @@ type LoginData = {
 export default function Login() {
   const navigate = useNavigate();
   const { login } = useAuth();
-
-  const [showPassword, setShowPassword] = useState(false);
 
   const {
     register,
@@ -56,7 +53,7 @@ export default function Login() {
 
   return (
     <main className="relative flex min-h-screen items-center justify-center overflow-hidden bg-slate-950">
-      {/* Aurora */}
+      {/* Aurora Background */}
       <div className="absolute -left-40 -top-40 h-[500px] w-[500px] rounded-full bg-cyan-500/20 blur-[140px]" />
       <div className="absolute -right-40 -bottom-40 h-[500px] w-[500px] rounded-full bg-violet-500/20 blur-[140px]" />
 
@@ -72,6 +69,25 @@ export default function Login() {
             Welcome Back
           </h2>
 
+          {/* Google Login */}
+          <div className="mb-6 flex justify-center">
+            <GoogleButton />
+          </div>
+
+          {/* Divider */}
+          <div className="relative mb-6">
+            <div className="absolute inset-0 flex items-center">
+              <div className="w-full border-t border-white/10" />
+            </div>
+
+            <div className="relative flex justify-center">
+              <span className="bg-slate-950 px-4 text-xs font-medium uppercase tracking-[0.3em] text-slate-500">
+                OR
+              </span>
+            </div>
+          </div>
+
+          {/* Login Form */}
           <form
             onSubmit={handleSubmit(onSubmit)}
             className="space-y-5"
@@ -83,27 +99,12 @@ export default function Login() {
               {...register("email")}
             />
 
-            <div className="relative">
-              <Input
-                label="Password"
-                type={showPassword ? "text" : "password"}
-                placeholder="Enter your password"
-                className="pr-12"
-                {...register("password")}
-              />
-
-              <button
-                type="button"
-                onClick={() => setShowPassword((prev) => !prev)}
-                className="absolute right-4 top-[43px] z-50 text-slate-400 transition hover:text-cyan-400"
-              >
-                {showPassword ? (
-                  <EyeOff size={20} />
-                ) : (
-                  <Eye size={20} />
-                )}
-              </button>
-            </div>
+            <Input
+              label="Password"
+              type="password"
+              placeholder="Enter your password"
+              {...register("password")}
+            />
 
             <Button loading={isSubmitting}>
               {isSubmitting ? "Signing In..." : "Sign In"}
