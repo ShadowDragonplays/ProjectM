@@ -1,62 +1,98 @@
-import type { InputHTMLAttributes } from "react";
+import {
+  Eye,
+  EyeOff,
+  Mail,
+  Lock,
+  User,
+} from "lucide-react";
+import {
+  forwardRef,
+  useState,
+  type InputHTMLAttributes,
+} from "react";
 
-interface Props extends InputHTMLAttributes<HTMLInputElement> {
+interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
   label?: string;
 }
 
-export default function Input({
-  label,
-  className = "",
-  ...props
-}: Props) {
-  return (
-    <div className="space-y-2">
+const Input = forwardRef<HTMLInputElement, InputProps>(
+  ({ label, className = "", type, ...props }, ref) => {
+    const [showPassword, setShowPassword] = useState(false);
 
-      {label && (
-        <label className="text-sm font-medium text-slate-300">
-          {label}
-        </label>
-      )}
+    const isPassword = type === "password";
 
-      <input
-        {...props}
-        className={`
-          w-full
+    const inputType =
+      isPassword && showPassword ? "text" : type;
 
-          rounded-xl
+    const Icon =
+      type === "email"
+        ? Mail
+        : isPassword
+        ? Lock
+        : User;
 
-          border
-          border-white/10
+    return (
+      <div className="space-y-2">
+        {label && (
+          <label className="text-sm font-medium text-slate-300">
+            {label}
+          </label>
+        )}
 
-          bg-white/[0.04]
+        <div className="relative">
+          <Icon
+            size={18}
+            className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500"
+          />
 
-          px-4
-          py-3
+          <input
+            ref={ref}
+            {...props}
+            type={inputType}
+            className={`
+              w-full
+              rounded-xl
+              border
+              border-white/10
+              bg-white/5
+              py-3
+              pl-11
+              ${isPassword ? "pr-12" : "pr-4"}
+              text-white
+              outline-none
+              backdrop-blur-xl
+              transition-all
+              duration-300
+              placeholder:text-slate-500
+              hover:border-cyan-400/30
+              focus:border-cyan-400
+              focus:ring-4
+              focus:ring-cyan-500/10
+              ${className}
+            `}
+          />
 
-          text-white
+          {isPassword && (
+            <button
+              type="button"
+              onClick={() =>
+                setShowPassword((prev) => !prev)
+              }
+              className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-500 transition hover:text-cyan-400"
+            >
+              {showPassword ? (
+                <EyeOff size={18} />
+              ) : (
+                <Eye size={18} />
+              )}
+            </button>
+          )}
+        </div>
+      </div>
+    );
+  }
+);
 
-          backdrop-blur-xl
+Input.displayName = "Input";
 
-          transition-all
-          duration-300
-
-          placeholder:text-slate-500
-
-          hover:border-cyan-400/40
-
-          focus:border-cyan-400
-
-          focus:ring-4
-          focus:ring-cyan-500/10
-
-          focus:bg-white/[0.06]
-
-          outline-none
-
-          ${className}
-        `}
-      />
-
-    </div>
-  );
-}
+export default Input;
