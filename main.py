@@ -31,12 +31,11 @@ def get_db():
 
 db_dependency = Annotated[Session, Depends(get_db)]
 
-
-@app.get("/")
+@app.get("/api")
 def root():
     return {"message": "ProjectM API is running"}
 
 
-@app.get("/users")
+@app.get("/api/users")
 def get_users(db: db_dependency):
     return db.query(models.User).all()

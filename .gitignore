@@ -1,7 +1,9 @@
 # Environment
 .env
 .env.*
+!/ .env.example
 /frontend/.env
+
 # Python
 __pycache__/
 *.py[cod]
@@ -13,3 +15,6 @@ myvenv/
 
 # Node
 node_modules/
+frontend/node_modules/
+frontend/dist/
+.vercel

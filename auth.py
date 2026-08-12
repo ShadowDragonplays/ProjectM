@@ -11,13 +11,17 @@ from sqlalchemy.orm import Session
 
 from database import SessionLocal
 from models import User
+import os
+SECRET_KEY = os.getenv("Auth_Secret")
+if not SECRET_KEY:
+    raise RuntimeError("Auth_Secret environment variable is not set")
 
+ALGORITHM = "HS256"
+ACCESS_TOKEN_EXPIRE_MINUTES = 30
 router = APIRouter(
-    prefix="/auth",
+    prefix="/api/auth",
     tags=["Authentication"]
 )
-
-SECRET_KEY = "EJTK45km2J76xIWzDt43HR7FDeQ7d1HtHiTpWyCJJnY"
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 30
 
@@ -26,7 +30,7 @@ bcrypt_context = CryptContext(
     deprecated="auto"
 )
 
-oauth2_bearer = OAuth2PasswordBearer(tokenUrl="auth/token")
+oauth2_bearer = OAuth2PasswordBearer(tokenUrl="api/auth/token")
 
 
 class CreateUserRequest(BaseModel):
